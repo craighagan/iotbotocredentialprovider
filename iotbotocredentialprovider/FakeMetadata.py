@@ -15,16 +15,12 @@ except ImportError:
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
-
 # hosts = ["169.254.169.254", "169.254.170.2"]
 # loopback is preferred, this will require that
 # the following be set:
-# /sbin/sysctl -w net.ipv4.conf.all.route_localnet=1
-# /sbin/iptables -t nat -A PREROUTING -p tcp -d 169.254.169.254 --dport 80 -j DNAT --to-destination 127.0.0.1:51680
-# may need the below, too
-# /sbin/iptables -t nat -A PREROUTING -p tcp -d 169.254.170.2   --dport 80 -j DNAT --to-destination 127.0.0.1:51680
+# /sbin/iptables -t nat -A OUTPUT -p tcp -d 169.254.169.254 --dport 80 -j DNAT --to-destination 127.0.0.1:51680
+# /sbin/iptables -t nat -A OUTPUT -p tcp -d 169.254.170.2   --dport 80 -j DNAT --to-destination 127.0.0.1:51680
 
-# hosts = ["169.254.169.254", "169.254.170.2"] # <%= @ip_address_list %>
 HOST = "127.0.0.1"
 PORT = 51680
 HOST = "0.0.0.0"
