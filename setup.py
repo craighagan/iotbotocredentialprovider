@@ -13,4 +13,5 @@ setup(name='iotbotocredentialprovider',
       install_requires=["boto3","requests"],
       setup_requires=["pytest-runner"],
       tests_require=["pytest", "pytest-runner"],
+      scripts=["bin/fakemetadata-server.py"],
 )
