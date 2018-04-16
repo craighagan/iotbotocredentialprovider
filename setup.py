@@ -10,6 +10,7 @@ setup(name='iotbotocredentialprovider',
       author_email='hagan@cih.com',
       url='n/a',
       packages = find_packages(exclude=["test"]),
+      install_requires=["boto3","requests"],
       setup_requires=["pytest-runner"],
       tests_require=["pytest", "pytest-runner"],
 )
