@@ -24,7 +24,9 @@ log.setLevel(logging.INFO)
 HOST = "127.0.0.1"
 PORT = 51680
 HOST = "0.0.0.0"
-ROLE_PATH = "/latest/meta-data/iam/security-credentials/"
+ROLE_PATH = "/latest/meta-data/iam/security-credentials"
+IDENTITY_PATH = "/latest/dynamic/instance-identity/document"
+SIGNATURE_PATH = "/latest/dynamic/instance-identity/signature"
 PING_PATH = "/ping"
 PING_RESPONSE = "pong"
 
@@ -51,8 +53,19 @@ class FakeMetadataCredentialProvider(IotBotoCredentialProvider):
             'AccessKeyId': self.credentials['accessKeyId'],
             'SecretAccessKey': self.credentials['secretAccessKey'],
             'Token': self.credentials['sessionToken'],
-            'Expiration': self.credentials['expiration']
+            'Expiration': self.credentials['expiration'],
+            'Code': 'Success',
+            'Type': 'AWS-HMAC',
+            'LastUpdated': self.credentials['expiration']
         }
+
+    @property
+    def account(self):
+        return self.metadata["account_id"]
+
+    @property
+    def region(self):
+        return self.metadata["region"]
 
     def update_timer(self, refresh_time_seconds=300):
         self._update_timer = Timer(refresh_time_seconds, self.get_credentials)
@@ -109,19 +122,31 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
     def get_role(self):
         return FakeMetadataRequestHandler.credential_provider.role_name
 
+    def get_identity_doc(self):
+        result = {
+            "accountId": FakeMetadataRequestHandler.credential_provider.account,
+            "region": FakeMetadataRequestHandler.credential_provider.region,
+        }
+        return result
+
     def do_GET(self):
         our_role = self.get_role()
-        our_path = ROLE_PATH + self.get_role()
+        our_path = ROLE_PATH + "/" + self.get_role()
         return_code = 200
         start_doc = "HTTP/1.0 200 OK\Content-Type: text/plain\n\n"
         result = ""
 
-        if self.path == PING_PATH:
+        stripped_path = self.path.rstrip("/")
+        if stripped_path == PING_PATH:
             result = PING_RESPONSE
-        elif self.path == ROLE_PATH:
+        elif stripped_path == ROLE_PATH:
             # client is requesting we return the role name
             result = our_role
-        elif self.path != our_path:
+        elif stripped_path == IDENTITY_PATH:
+            result = json.dumps(self.get_identity_doc(), default=json_serial, indent=4)
+        elif stripped_path == SIGNATURE_PATH:
+            result = "bad"
+        elif stripped_path != our_path:
             # client asked for a role we don't serve
             return_code = 404
             start_doc = "HTTP/1.0 400 Bad Request\nContent-Type: text/html\n"
