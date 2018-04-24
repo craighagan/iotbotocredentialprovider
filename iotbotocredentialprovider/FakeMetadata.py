@@ -140,7 +140,7 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
         try:
             override = json.load(open(INSTANCE_DOCUMENT_OVERRIDE_FILE))
             result.update(override)
-        except ValueError, IOError:
+        except (ValueError, IOError):
             pass
 
         return result
