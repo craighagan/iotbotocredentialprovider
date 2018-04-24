@@ -1,10 +1,12 @@
 import botocore.auth
+import platform
 import datetime
 import json
 import logging
+import os
 import random
 from threading import Timer
-from .AWS import IotBotoCredentialProvider
+from .AWS import IotBotoCredentialProvider, default_iot_metadata_path
 
 try:
     from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
@@ -29,6 +31,7 @@ IDENTITY_PATH = "/latest/dynamic/instance-identity/document"
 SIGNATURE_PATH = "/latest/dynamic/instance-identity/signature"
 PING_PATH = "/ping"
 PING_RESPONSE = "pong"
+INSTANCE_DOCUMENT_OVERRIDE_FILE = os.path.join(default_iot_metadata_path, "instance_document_overrides.json")
 
 
 def json_serial(obj):
@@ -126,7 +129,20 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
         result = {
             "accountId": FakeMetadataRequestHandler.credential_provider.account,
             "region": FakeMetadataRequestHandler.credential_provider.region,
+            "architecture": platform.processor(),
+            "availabilityZone": "fake",
+            "imageId": "fake",
+            "instanceId": FakeMetadataRequestHandler.credential_provider.metadata['device_name'],
+            "instanceType": "f1.fake",
+            "privateIp": "fake",
         }
+
+        try:
+            override = json.load(open(INSTANCE_DOCUMENT_OVERRIDE_FILE))
+            result.update(override)
+        except ValueError, IOError:
+            pass
+
         return result
 
     def do_GET(self):
