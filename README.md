@@ -21,7 +21,20 @@ session = iotbotocredentialprovider.AWS.get_boto3_session(region_name="us-east-2
 s3_client = session.client('s3')
 s3_client.list_buckets()
 ```
-## Using the metadata server
+
+## Using the metadata server - method 1 with docker bridge networks
+
+docker build -t metadata-server metadata-container
+
+```
+docker network create --driver bridge metadata_network --subnet 169.254.169.0/16
+
+# adjust arguments appropriately if you want to use this as a service
+docker run -v /AWSIoT:/AWSIoT --net=metadata_network \
+    --ip=169.254.169.254 --name metadata-server metadata-server:latest
+```
+
+## Using the metadata server - method 2 with ip tables
 
 ### Configure iptables
 
