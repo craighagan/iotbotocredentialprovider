@@ -30,8 +30,8 @@ docker build -t metadata-server metadata-container
 docker network create --driver bridge metadata_network --subnet 169.254.169.0/16
 
 # adjust arguments appropriately if you want to use this as a service
-docker run -v /AWSIoT:/AWSIoT --net=metadata_network \
-    --ip=169.254.169.254 --name metadata-server metadata-server:latest
+docker run -v /AWSIoT:/AWSIoT --restart unless-stopped --detach --net=metadata_network \
+    --ip=169.254.169.254 metadata-server:latest
 ```
 
 ## Using the metadata server - method 2 with ip tables
