@@ -129,7 +129,7 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
         result = {
             "accountId": FakeMetadataRequestHandler.credential_provider.account,
             "region": FakeMetadataRequestHandler.credential_provider.region,
-            "architecture": platform.processor(),
+            "architecture": platform.machine(),
             "availabilityZone": "fake",
             "imageId": "fake",
             "instanceId": FakeMetadataRequestHandler.credential_provider.metadata['device_name'],
