@@ -29,6 +29,7 @@ HOST = "0.0.0.0"
 ROLE_PATH = "/latest/meta-data/iam/security-credentials"
 IDENTITY_PATH = "/latest/dynamic/instance-identity/document"
 SIGNATURE_PATH = "/latest/dynamic/instance-identity/signature"
+PLACEMENT_AVAILABILITY_ZONE_PATH = "/latest/meta-data/placement/availability-zone"
 PING_PATH = "/ping"
 PING_RESPONSE = "pong"
 INSTANCE_DOCUMENT_OVERRIDE_FILE = os.path.join(default_iot_metadata_path, "instance_document_overrides.json")
@@ -125,6 +126,16 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
     def get_role(self):
         return FakeMetadataRequestHandler.credential_provider.role_name
 
+    def get_placement_availability_zone(self):
+        result = "fake"
+        try:
+            override = json.load(open(INSTANCE_DOCUMENT_OVERRIDE_FILE))
+            result = override.get("availabilityZone", result)
+        except (ValueError, IOError):
+            pass
+
+        return result
+
     def get_identity_doc(self):
         result = {
             "accountId": FakeMetadataRequestHandler.credential_provider.account,
@@ -158,6 +169,8 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
         elif stripped_path == ROLE_PATH:
             # client is requesting we return the role name
             result = our_role
+        elif stripped_path == PLACEMENT_AVAILABILITY_ZONE_PATH:
+            result = self.get_placement_availability_zone()
         elif stripped_path == IDENTITY_PATH:
             result = json.dumps(self.get_identity_doc(), default=json_serial, indent=4)
         elif stripped_path == SIGNATURE_PATH:
