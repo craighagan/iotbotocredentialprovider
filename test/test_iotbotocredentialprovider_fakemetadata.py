@@ -50,11 +50,15 @@ class TestFakeMetadata(object):
         self.cp._credential_expiration = expire_time
 
         metadata_creds = self.cp.metadata_credentials
+
+        del metadata_creds["LastUpdated"]
         assert metadata_creds == {
             'AccessKeyId': fake_credentials['accessKeyId'],
             'SecretAccessKey': fake_credentials['secretAccessKey'],
             'Token': fake_credentials['sessionToken'],
-            'Expiration': fake_credentials['expiration']
+            'Expiration': fake_credentials['expiration'],
+            'Code': 'Success',
+            'Type': 'AWS-HMAC',
         }
 
     def test_role_name(self):

@@ -227,6 +227,7 @@ class FakeMetadataServer(object):
         if self.port is None:
             self.port = PORT
 
+        print(" server for %s:%s" % (self.host, self.port))
         self.server = HTTPServer((self.host, self.port), self.request_handler)
 
     def stop(self):

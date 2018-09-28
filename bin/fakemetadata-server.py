@@ -11,7 +11,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, dest="port",
                         help="port to listen on defaults to %s" % PORT, required=False, default=PORT)
+    parser.add_argument("--host", dest="host", default="0.0.0.0",
+                        help="host to bind to defaults to 0.0.0.0")
     args = parser.parse_args()
 
-    f = FakeMetadataServer(FakeMetadataRequestHandler, port=args.port)
+    print("got args host=%s port=%s" % (args.host, args.port))
+    f = FakeMetadataServer(FakeMetadataRequestHandler, host=args.host, port=args.port)
     f.run()
