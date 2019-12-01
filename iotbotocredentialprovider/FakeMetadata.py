@@ -160,7 +160,7 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
         our_role = self.get_role()
         our_path = ROLE_PATH + "/" + self.get_role()
         return_code = 200
-        start_doc = "HTTP/1.0 200 OK\nContent-Type: text/plain\n\n"
+        start_doc = "Content-Type: text/plain\n\n"
         result = ""
 
         stripped_path = self.path.rstrip("/")
@@ -178,7 +178,7 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
         elif stripped_path != our_path:
             # client asked for a role we don't serve
             return_code = 404
-            start_doc = "HTTP/1.0 400 Bad Request\nContent-Type: text/html\n"
+            start_doc = "Content-Type: text/html\n"
             result = """
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
