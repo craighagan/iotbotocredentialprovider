@@ -160,7 +160,7 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
         our_role = self.get_role()
         our_path = ROLE_PATH + "/" + self.get_role()
         return_code = 200
-        start_doc = "HTTP/1.0 200 OK\Content-Type: text/plain\n\n"
+        start_doc = "HTTP/1.0 200 OK\nContent-Type: text/plain\n\n"
         result = ""
 
         stripped_path = self.path.rstrip("/")
