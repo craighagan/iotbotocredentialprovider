@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import random
+import sys
 from threading import Timer
 from .AWS import IotBotoCredentialProvider, default_iot_metadata_path
 
@@ -164,7 +165,12 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
         our_role = self.get_role()
         our_path = ROLE_PATH + "/" + self.get_role()
         return_code = 200
-        start_doc = "Content-Type: text/plain\n\n"
+        response_prefix = ""
+        if sys.version_info.major == 3:
+            response_prefix = "HTTP/1.0 200 OK\n"
+
+        start_doc = "%sServer: %s\nDate: %s\nContent-Type: text/plain\n\n" % \
+           (response_prefix, self.version_string(), self.date_time_string())
         result = ""
 
         stripped_path = self.path.rstrip("/")
@@ -184,7 +190,10 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
         elif stripped_path != our_path:
             # client asked for a role we don't serve
             return_code = 404
-            start_doc = "Content-Type: text/html\n"
+            if sys.version_info.major == 3:
+                response_prefix = "HTTP/1.0 404 Not Found\n"
+
+            start_doc = "%sContent-Type: text/html\n" % response_prefix
             result = """
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -200,7 +209,6 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
 """
         else:
             # client asked for credentials
-            # start_doc ="HTTP/1.0 200 OK\nContent-Type: application/json\n\n"
             credentials = self.get_credentials()
             result = json.dumps(credentials, default=json_serial, indent=4)
         self.send_response(return_code)
