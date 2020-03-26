@@ -43,6 +43,13 @@ docker run -v /AWSIoT:/AWSIoT --restart unless-stopped --detach --net=metadata_n
 /sbin/iptables -t nat -A OUTPUT -p tcp -d 169.254.170.2   --dport 80 -j DNAT --to-destination 127.0.0.1:51680
 ```
 
+if you have docker
+
+```
+/sbin/iptables -t nat -I PREROUTING -p tcp -d 169.254.169.254 --dport 80 -j REDIRECT --to-ports 51680 -i docker0
+/sbin/iptables -t nat -I PREROUTING -p tcp -d 169.254.170.2 --dport 80 -j REDIRECT --to-ports 51680 -i docker0
+```
+
 ### Start the server
 
 Create a script/service which runs this:
