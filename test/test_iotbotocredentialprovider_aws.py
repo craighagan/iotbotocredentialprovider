@@ -179,7 +179,7 @@ class TestGetSessions(object):
 
     def test_configure_session(self):
         my_session = botocore.session.Session()
-        original_component_list = set(deepcopy(my_session.get_component('credential_provider').providers))
+        original_component_list = my_session.get_component('credential_provider').providers
         for x in original_component_list:
             assert not isinstance(x, iotbotocredentialprovider.AWS.IotBotoCredentialProvider)
 

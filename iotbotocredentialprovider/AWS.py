@@ -11,7 +11,7 @@ from botocore.credentials import CredentialProvider, RefreshableCredentials
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
-default_iot_metadata_path = "/AWSIoT"
+default_iot_metadata_path = os.environ.get("FAKE_METADATA_PATH", "/AWSIoT")
 
 
 class IotBotoCredentialProviderError(Exception):

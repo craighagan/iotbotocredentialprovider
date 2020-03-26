@@ -28,6 +28,7 @@ PORT = 51680
 HOST = "0.0.0.0"
 ROLE_PATH = "/latest/meta-data/iam/security-credentials"
 IDENTITY_PATH = "/latest/dynamic/instance-identity/document"
+INSTANCE_ID_PATH = "/latest/meta-data/instance-id"
 SIGNATURE_PATH = "/latest/dynamic/instance-identity/signature"
 PLACEMENT_AVAILABILITY_ZONE_PATH = "/latest/meta-data/placement/availability-zone"
 PING_PATH = "/ping"
@@ -156,6 +157,9 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
 
         return result
 
+    def do_PUT(self):
+        return
+
     def do_GET(self):
         our_role = self.get_role()
         our_path = ROLE_PATH + "/" + self.get_role()
@@ -173,6 +177,8 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
             result = self.get_placement_availability_zone()
         elif stripped_path == IDENTITY_PATH:
             result = json.dumps(self.get_identity_doc(), default=json_serial, indent=4)
+        elif stripped_path == INSTANCE_ID_PATH:
+            result = self.get_identity_doc().get("instanceId")
         elif stripped_path == SIGNATURE_PATH:
             result = "bad"
         elif stripped_path != our_path:
