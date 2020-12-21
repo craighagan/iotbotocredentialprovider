@@ -36,6 +36,8 @@ PING_PATH = "/ping"
 PING_RESPONSE = "pong"
 INSTANCE_DOCUMENT_OVERRIDE_FILE = os.path.join(default_iot_metadata_path, "instance_document_overrides.json")
 
+ALLOWED_SOURCES = ['169.254.170.2', '169.254.169.254']
+
 
 def json_serial(obj):
     """
@@ -162,6 +164,9 @@ class FakeMetadataRequestHandler(BaseHTTPRequestHandler):
         return
 
     def do_GET(self):
+        if not self.client_address[0] in ALLOWED_SOURCES:
+            return
+
         our_role = self.get_role()
         our_path = ROLE_PATH + "/" + self.get_role()
         return_code = 200
